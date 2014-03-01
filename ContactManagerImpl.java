@@ -1,17 +1,21 @@
-import java.util.*
-import java.io.*
+import java.util.*;
+import java.io.*;
 
 public class ContactManagerImpl{
-	private List<Meeting> meetings = new ArrayList<Meeting>();
+	private String fileName = "";
+	private List<MeetingImpl> meetings = new ArrayList<MeetingImpl>();
 	private Set<Contact> contacts = new HashSet<Contact>();
 
-	public ContactManagerImpl(List<Meeting> meetings, Set<Contact> contacts){
+
+	public ContactManagerImpl(String fileName, List<MeetingImpl> meetings, Set<Contact> contacts){
+		this.fileName = fileName;
 		this.meetings = meetings;
 		this.contacts = contacts;
 	}
 
-	public ContactManagerImpl(){
-
+//empty constructor for testing******************************************
+	public ContactManagerImpl(String fileName){
+		this.fileName = fileName;
 	}
 
 //adds contacts to Set<Contact>
@@ -19,9 +23,9 @@ public class ContactManagerImpl{
 		
 	}
 
-//gets the data from the file and transfers it to list<Meeting> and Set<contact>
+//gets the data from the file and transfers it to list<Meeting> and Set<Contact>
 	private void getData(){
-		File file = new File("contacts.csv.numbers");
+		File file = new File (this.fileName);
 		BufferedReader in = null;
 		try
 		{
@@ -62,29 +66,30 @@ public class ContactManagerImpl{
 		}
 	}
 
-//Once a line is read from the file this method splits the different variables and creates an object of type Contact
+//Once a line is read from the file this method splits the different variables and creates an object of type Contact and
+//adds it to the Hashset contacts.
 	private void createContact(String line){
 		String[] contactArray = line.split(",");
-		if (contactArray[2].length() == 0)
-		{
-			contactArray[2] = "";
-		}
 		
-		ContactImpl newContact = new ContactImpl(Integer.parseInt(contactArray[0]), contactArray[1], contactArray[2]);
+		Contact newContact = new ContactImpl(Integer.parseInt(contactArray[0]), contactArray[1], contactArray[2]);
 		
+		contacts.add(newContact);
 
-		int contactsid = newContact.getId();
-		System.out.println(contactsid);
-		
+	}
+
+//Prints the list of contacts
+	private void printContacts(){
+		for (Contact contact: contacts){
+			System.out.println(contact);
+		}
 	}
 
 //main method
 	public static void main(String[] args){
-		ContactManagerImpl jos = new ContactManagerImpl();
+		ContactManagerImpl jos = new ContactManagerImpl("/Users/Jo/Documents/contacts.txt");
 		jos.getData();
+		jos.printContacts();
 	}
-
-	
 
 
 

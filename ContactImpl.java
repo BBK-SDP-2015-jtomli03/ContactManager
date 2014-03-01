@@ -1,5 +1,5 @@
-public class ContactImpl{
-	private int id = null;
+public class ContactImpl implements Contact{
+	private int id = 0;
 	private String name = "";
 	private String notes = "";
 
@@ -23,4 +23,12 @@ public class ContactImpl{
 	public String getNotes(){
 		return this.notes;
 	}
+
+//adds notes to a contact
+	public void addNotes(String note){
+		String completeNotes = this.notes + " " + note;
+		this.notes = completeNotes;
+	}
+
+
 }
