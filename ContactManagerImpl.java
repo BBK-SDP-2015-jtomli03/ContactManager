@@ -1,13 +1,14 @@
 import java.util.*;
 import java.io.*;
+import java.net.URL;
 
 public class ContactManagerImpl{
 	private String fileName = "";
-	private List<MeetingImpl> meetings = new ArrayList<MeetingImpl>();
+	private List<Meeting> meetings = new ArrayList<Meeting>();
 	private Set<Contact> contacts = new HashSet<Contact>();
 
 
-	public ContactManagerImpl(String fileName, List<MeetingImpl> meetings, Set<Contact> contacts){
+	public ContactManagerImpl(String fileName, List<Meeting> meetings, Set<Contact> contacts){
 		this.fileName = fileName;
 		this.meetings = meetings;
 		this.contacts = contacts;
@@ -18,13 +19,10 @@ public class ContactManagerImpl{
 		this.fileName = fileName;
 	}
 
-//adds contacts to Set<Contact>
-	private void addContactToSet(){
-		
-	}
 
 //gets the data from the file and transfers it to list<Meeting> and Set<Contact>
 	private void getData(){
+
 		File file = new File (this.fileName);
 		BufferedReader in = null;
 		try
@@ -33,7 +31,7 @@ public class ContactManagerImpl{
 			String line;
 			while ((line = in.readLine()) != null)
 			{
-				//write code here to split etc
+				
 				createContact(line);
 
 			}
@@ -66,10 +64,15 @@ public class ContactManagerImpl{
 		}
 	}
 
-//Once a line is read from the file this method splits the different variables and creates an object of type Contact and
-//adds it to the Hashset contacts.
+/**Once a line is read from the file this method splits the different variables and creates an object of type Contact and
+adds it to the Hashset contacts.*/
 	private void createContact(String line){
 		String[] contactArray = line.split(",");
+
+		//if there are no notes in the txt document for this contact, this prevents an exception by initialising the notes
+		if(contactArray[2].length() == 0){
+			contactArray[2] = "";
+		}
 		
 		Contact newContact = new ContactImpl(Integer.parseInt(contactArray[0]), contactArray[1], contactArray[2]);
 		
@@ -80,8 +83,17 @@ public class ContactManagerImpl{
 //Prints the list of contacts
 	private void printContacts(){
 		for (Contact contact: contacts){
-			System.out.println(contact);
+			int id = contact.getId();
+			String name = contact.getName();
+			String notes = contact.getNotes();
+			System.out.println(id + ", " + name + ", " + notes);
+			
 		}
+	}
+
+//gets the list of contacts
+	private Set<Contact> getContacts(){
+		return contacts;
 	}
 
 //main method
@@ -91,19 +103,10 @@ public class ContactManagerImpl{
 		jos.printContacts();
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+//adds contacts to Set<Contact>
+	private void addContactToSet(){
+		
+	}
 
 
 

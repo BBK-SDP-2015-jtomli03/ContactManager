@@ -9,6 +9,10 @@ public class ContactImpl implements Contact{
 		this.notes = notes;
 	}
 
+	public ContactImpl(){
+		
+	}
+
 //gets the ID of the contact
 	public int getId(){
 		return this.id;
