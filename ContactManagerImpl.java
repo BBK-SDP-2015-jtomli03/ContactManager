@@ -19,6 +19,30 @@ public class ContactManagerImpl{
 		this.fileName = fileName;
 	}
 
+//writes a contact to the file
+	private void writeContactToFile(ContactImpl contact){
+		PrintWriter out = null;
+		try{
+			File file = new File(getFileName());
+			out = new PrintWriter(new FileWriter(file, true));
+			String line = "c," + contact.getId() + "," + contact.getName() + "," + contact.getNotes() + "\n";
+			out.append(line);
+			out.flush();
+		}catch (FileNotFoundException ex){
+			System.out.println("Cannot write to file " + getFileName());
+		}catch (IOException ex){
+			ex.printStackTrace();
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		finally {
+			out.close();
+		}
+
+	}
+
+
+
 
 //gets the data from the file and transfers it to list<Meeting> and Set<Contact>
 	private void getData(){
@@ -85,6 +109,10 @@ adds it to the Hashset contacts.*/
 		contacts.add(newContact);
 		}
 
+		if(contactArray[0].equals(meeting)){
+
+		}
+
 	}
 
 //Prints the list of contacts
@@ -93,14 +121,18 @@ adds it to the Hashset contacts.*/
 			int id = contact.getId();
 			String name = contact.getName();
 			String notes = contact.getNotes();
-			System.out.println(id + ", " + name + ", " + notes);
-			
+			System.out.println(id + ", " + name + ", " + notes);	
 		}
 	}
 
 //gets the list of contacts
 	private Set<Contact> getContacts(){
 		return contacts;
+	}
+
+//gets the filename
+	private String getFileName(){
+		return this.fileName;
 	}
 
 //adds contacts to Set<Contact>
@@ -113,6 +145,9 @@ adds it to the Hashset contacts.*/
 		ContactManagerImpl jos = new ContactManagerImpl("/Users/Jo/Documents/contacts.txt");
 		jos.getData();
 		jos.printContacts();
+		System.out.println(jos.getFileName());
+		ContactImpl contact = new ContactImpl(3,"Jon","Jons notes");
+		jos.writeContactToFile(contact);
 	}
 
 

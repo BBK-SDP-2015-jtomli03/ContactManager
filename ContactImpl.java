@@ -10,8 +10,9 @@ public class ContactImpl implements Contact{
 	}
 
 	public ContactImpl(){
-		
+
 	}
+
 
 //gets the ID of the contact
 	public int getId(){
