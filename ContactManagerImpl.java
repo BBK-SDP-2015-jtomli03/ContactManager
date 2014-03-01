@@ -25,7 +25,7 @@ public class ContactManagerImpl{
 		try{
 			File file = new File(getFileName());
 			out = new PrintWriter(new FileWriter(file, true));
-			String line = "c," + contact.getId() + "," + contact.getName() + "," + contact.getNotes() + "\n";
+			String line = "\n" + "c," + contact.getId() + "," + contact.getName() + "," + contact.getNotes();
 			out.append(line);
 			out.flush();
 		}catch (FileNotFoundException ex){
@@ -136,8 +136,8 @@ adds it to the Hashset contacts.*/
 	}
 
 //adds contacts to Set<Contact>
-	private void addContactToSet(){
-		
+	private void addContactToSet(Contact contact){
+		contacts.add(contact);
 	}
 
 //main method
@@ -146,8 +146,13 @@ adds it to the Hashset contacts.*/
 		jos.getData();
 		jos.printContacts();
 		System.out.println(jos.getFileName());
-		ContactImpl contact = new ContactImpl(3,"Jon","Jons notes");
-		jos.writeContactToFile(contact);
+		ContactImpl contact = new ContactImpl(3,"Jon","Jons notes.");
+		jos.addContactToSet(contact);
+		jos.printContacts();
+		//contact.addNotes("Has this added??");
+		//jos.writeContactToFile(contact);
+		
+
 	}
 
 
