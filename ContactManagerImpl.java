@@ -1,6 +1,6 @@
 import java.util.*;
 import java.io.*;
-import java.net.URL;
+
 
 public class ContactManagerImpl{
 	private String fileName = "";
@@ -50,6 +50,7 @@ public class ContactManagerImpl{
 		}
 	}
 
+//Closes the data source
 	private void closeReader(Reader reader){
 		try
 		{
@@ -69,14 +70,20 @@ adds it to the Hashset contacts.*/
 	private void createContact(String line){
 		String[] contactArray = line.split(",");
 
-		//if there are no notes in the txt document for this contact, this prevents an exception by initialising the notes
-		if(contactArray[2].length() == 0){
-			contactArray[2] = "";
+		String contact = "c";
+		String meeting = "m";
+
+		/**if there are no notes in the txt document for this contact/meeting, 
+		this prevents an exception by initialising the notes/meeting*/
+		if(contactArray[3].length() == 0){
+			contactArray[3] = "";
 		}
+
+		if(contactArray[0].equals(contact)){
 		
-		Contact newContact = new ContactImpl(Integer.parseInt(contactArray[0]), contactArray[1], contactArray[2]);
-		
+		Contact newContact = new ContactImpl(Integer.parseInt(contactArray[1]), contactArray[2], contactArray[3]);
 		contacts.add(newContact);
+		}
 
 	}
 
@@ -96,16 +103,16 @@ adds it to the Hashset contacts.*/
 		return contacts;
 	}
 
+//adds contacts to Set<Contact>
+	private void addContactToSet(){
+		
+	}
+
 //main method
 	public static void main(String[] args){
 		ContactManagerImpl jos = new ContactManagerImpl("/Users/Jo/Documents/contacts.txt");
 		jos.getData();
 		jos.printContacts();
-	}
-
-//adds contacts to Set<Contact>
-	private void addContactToSet(){
-		
 	}
 
 
