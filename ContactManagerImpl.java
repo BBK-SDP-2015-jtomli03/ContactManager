@@ -40,8 +40,8 @@ public class ContactManagerImpl{
 		}
 	}
 
-//writes all contacts to the file
-	private void writeContactsToFile(){
+//Saves all data to the file
+	private void flush(){
 		PrintWriter out = null;
 		try{
 			File file = new File(getFileName());
@@ -212,7 +212,7 @@ adds it to the Hashset contacts.*/
 		jos.addContactToSet(newContact);
 		System.out.println("Printing before writing.....");
 		jos.printContacts();
-		jos.writeContactsToFile();
+		jos.flush();
 		System.out.println("Have written the contacts to file.....");
 		jos.printContacts();
 		jos.getData();
@@ -225,13 +225,13 @@ adds it to the Hashset contacts.*/
 		jos.addContactToSet(newContact);
 		newContact = new ContactImpl(jos.getNewContactID(),"Pablo"," notes.");
 		jos.addContactToSet(newContact);
-		jos.writeContactsToFile();
+		jos.flush();
 		jos.printContacts();
 		System.out.println("Getting data again.....");
 		jos.getData();
 		jos.printContacts();
 		System.out.println("Writing data to file again.....");
-		jos.writeContactsToFile();
+		jos.flush();
 		System.out.println("Printing contacts as in the set....");
 		jos.addNewContact("Newton", "Notes");
 		jos.printContacts();
