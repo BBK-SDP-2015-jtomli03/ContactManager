@@ -1,13 +1,22 @@
 public class ContactImpl implements Contact{
+	private static int uniqueId = 1;
 	private int id = 0;
 	private String name = "";
 	private String notes = "";
+
+	public ContactImpl(String name, String notes){
+		this.name = name;
+		this.notes = notes;
+		this.id = uniqueId;
+		uniqueId ++;
+	}
 
 	public ContactImpl(int id, String name, String notes){
 		this.id = id;
 		this.name = name;
 		this.notes = notes;
 	}
+
 
 	public ContactImpl(){
 

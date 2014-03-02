@@ -19,14 +19,20 @@ public class ContactManagerImpl{
 		this.fileName = fileName;
 	}
 
+//returns the set of contacts
+	public Set<Contact> getContacts(){
+		return contacts;
+	}
+
 //writes a contact to the file
 	private void writeContactToFile(ContactImpl contact){
 		PrintWriter out = null;
 		try{
 			File file = new File(getFileName());
 			out = new PrintWriter(new FileWriter(file, true));
-			String line = "\n" + "c," + contact.getId() + "," + contact.getName() + "," + contact.getNotes();
-			out.append(line);
+			String line = "c," + contact.getId() + "," + contact.getName() + "," + contact.getNotes() + "\r\n";
+			out.write(line);
+			contacts.clear();
 			out.flush();
 		}catch (FileNotFoundException ex){
 			System.out.println("Cannot write to file " + getFileName());
@@ -105,8 +111,15 @@ adds it to the Hashset contacts.*/
 
 		if(contactArray[0].equals(contact)){
 		
-		Contact newContact = new ContactImpl(Integer.parseInt(contactArray[1]), contactArray[2], contactArray[3]);
-		contacts.add(newContact);
+			Contact newContact = new ContactImpl(Integer.parseInt(contactArray[1]), contactArray[2], contactArray[3]);
+			//for (Contact contactInContacts: contacts){
+			//	if(newContact.getId()== contactInContacts.getId()){
+			//		newContact = contactInContacts;
+			//	}
+			//	else{
+					contacts.add(newContact);
+				//}
+			//}
 		}
 
 		if(contactArray[0].equals(meeting)){
@@ -122,10 +135,6 @@ adds it to the Hashset contacts.*/
 		}
 	}
 
-//gets the list of contacts
-	private Set<Contact> getContacts(){
-		return contacts;
-	}
 
 //gets the filename
 	private String getFileName(){
@@ -140,14 +149,22 @@ adds it to the Hashset contacts.*/
 //main method
 	public static void main(String[] args){
 		ContactManagerImpl jos = new ContactManagerImpl("/Users/Jo/Documents/contacts.txt");
+		//jos.getData();
+		//jos.printContacts();
+		//System.out.println(jos.getFileName());
+		//contact.addNotes("Has this added??");
+		ContactImpl newContact = new ContactImpl("Jon","Jons notes.");
+		jos.addContactToSet(newContact);
+		jos.writeContactToFile(newContact);
+		newContact = new ContactImpl("Jeff","Jeffs notes.");
+		jos.addContactToSet(newContact);
+		jos.writeContactToFile(newContact);
+		newContact = new ContactImpl("Jake","Jakes notes.");
+		jos.addContactToSet(newContact);
+		jos.writeContactToFile(newContact);
 		jos.getData();
 		jos.printContacts();
-		//System.out.println(jos.getFileName());
-		//ContactImpl contact = new ContactImpl(3,"Jon","Jons notes.");
-		//jos.addContactToSet(contact);
-		//jos.printContacts();
-		//contact.addNotes("Has this added??");
-		//jos.writeContactToFile(contact);
+
 		
 
 	}
