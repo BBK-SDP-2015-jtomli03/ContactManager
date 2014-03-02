@@ -224,22 +224,36 @@ adds it to the Hashset contacts.*/
 		return null;
 	}
 
+//returns a set of contacts corresponding to the ID's entered
+	private Set<Contact> getContacts(int... ids){
+		Set<Contact> contactsWithId = new HashSet<Contact>();
+		for (Contact contact : contacts){
+			int numOfIds = ids.length;
+			for(int count = 0; count < numOfIds; count++){
+				if(ids[count] == contact.getId()){
+					contactsWithId.add(contact);
+				}
+			}
+		}
+		return contactsWithId;
+	}
+
 //main method
 	public static void main(String[] args){
 		ContactManagerImpl jos = new ContactManagerImpl("/Users/Jo/Documents/contacts.txt");
-		//jos.getData();
+		jos.getData();
 		//jos.printContacts();
 		//System.out.println(jos.getFileName());
 
-		ContactImpl newContact = new ContactImpl(jos.getNewContactID(),"Andy"," notes.");
+		/**ContactImpl newContact = new ContactImpl(jos.getNewContactID(),"Andy"," notes.");
 		jos.addContactToSet(newContact);
 		newContact = new ContactImpl(jos.getNewContactID(),"Bill"," notes.");
 		jos.addContactToSet(newContact);
 		newContact = new ContactImpl(jos.getNewContactID(),"Callum"," notes.");
 		jos.addContactToSet(newContact);
-		System.out.println("Printing before writing.....");
+		System.out.println("Printing before writing.....");*/
 		jos.printContacts();
-		jos.flush();
+		/**jos.flush();
 		System.out.println("Have written the contacts to file.....");
 		jos.printContacts();
 		jos.getData();
@@ -267,6 +281,7 @@ adds it to the Hashset contacts.*/
 		jos.printContacts(jos.getContacts("l"));
 		System.out.println("Checking they are still in Set contacts....");
 		jos.printContacts();
+		jos.flush();*/
 
 		/**newContact = new ContactImpl("Will","Wills notes.");
 		jos.addContactToSet(newContact);
@@ -276,6 +291,10 @@ adds it to the Hashset contacts.*/
 		System.out.println("Will should be written to the file and then we have him back again....");
 		jos.getData();
 		jos.printContacts();*/
+		System.out.println("Should print contacts 1, 2, and 5!");
+		jos.printContacts(jos.getContacts(1,2,5));
+		System.out.println("Checking they are still in Set contacts....");
+		jos.printContacts();
 
 		
 
