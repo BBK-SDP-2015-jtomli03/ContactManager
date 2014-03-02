@@ -214,6 +214,16 @@ adds it to the Hashset contacts.*/
 		return contactsWithString;
 	}	
 
+//returns a contact by ID
+	private Contact getContact(int id){
+		for(Contact contact : contacts){
+			if(contact.getId() == id){
+				return contact;
+			}
+		}
+		return null;
+	}
+
 //main method
 	public static void main(String[] args){
 		ContactManagerImpl jos = new ContactManagerImpl("/Users/Jo/Documents/contacts.txt");
@@ -235,7 +245,6 @@ adds it to the Hashset contacts.*/
 		jos.getData();
 		System.out.println("Have now got the data back from the file.....");
 		jos.printContacts();
-		//contact.addNotes("Has this added??");
 		System.out.println("Adding new contacts to the set, writing to file......");
 		newContact = new ContactImpl(jos.getNewContactID(),"Jake"," notes.");
 		jos.addContactToSet(newContact);
@@ -253,8 +262,9 @@ adds it to the Hashset contacts.*/
 		System.out.println("Printing contacts as in the set....");
 		jos.addNewContact("Newton", "Notes");
 		jos.printContacts();
-		System.out.println("Printing contacts with the string ll....");
-		jos.printContacts(jos.getContacts("Pa"));
+		jos.getContact(6).addNotes("Has this added??");
+		System.out.println("Printing contacts with the string l....");
+		jos.printContacts(jos.getContacts("l"));
 		System.out.println("Checking they are still in Set contacts....");
 		jos.printContacts();
 
