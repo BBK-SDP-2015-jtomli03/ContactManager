@@ -1,5 +1,6 @@
 import java.util.*;
 import java.io.*;
+import java.lang.String;
 
 
 public class ContactManagerImpl{
@@ -19,10 +20,7 @@ public class ContactManagerImpl{
 		this.fileName = fileName;
 	}
 
-//returns the set of contacts
-	public Set<Contact> getContacts(){
-		return contacts;
-	}
+
 
 //returns a unique contact ID
 	private int getNewContactID(){
@@ -179,6 +177,13 @@ adds it to the Hashset contacts.*/
 		}
 	}
 
+//Prints the list of contacts in the Set contactsWithString
+	private void printContacts(Set<Contact> contactsWithString){
+		for (Contact contact: contactsWithString){	
+			System.out.println(contact.toString());
+		}
+	}
+
 
 //gets the filename
 	private String getFileName(){
@@ -196,13 +201,25 @@ adds it to the Hashset contacts.*/
 		contacts.add(contact);
 	}
 
+//gets a contact whos name contains a particular string
+	private Set<Contact> getContacts(String name){
+		Set<Contact> contactsWithString = new HashSet<Contact>();
+		int searchIndex = -1;
+		for(Contact contact : contacts){
+			searchIndex = contact.getName().indexOf(name);
+			if(searchIndex != -1){
+				contactsWithString.add(contact);
+			}
+		}
+		return contactsWithString;
+	}	
+
 //main method
 	public static void main(String[] args){
 		ContactManagerImpl jos = new ContactManagerImpl("/Users/Jo/Documents/contacts.txt");
 		//jos.getData();
 		//jos.printContacts();
 		//System.out.println(jos.getFileName());
-		//contact.addNotes("Has this added??");
 
 		ContactImpl newContact = new ContactImpl(jos.getNewContactID(),"Andy"," notes.");
 		jos.addContactToSet(newContact);
@@ -218,6 +235,7 @@ adds it to the Hashset contacts.*/
 		jos.getData();
 		System.out.println("Have now got the data back from the file.....");
 		jos.printContacts();
+		//contact.addNotes("Has this added??");
 		System.out.println("Adding new contacts to the set, writing to file......");
 		newContact = new ContactImpl(jos.getNewContactID(),"Jake"," notes.");
 		jos.addContactToSet(newContact);
@@ -234,6 +252,10 @@ adds it to the Hashset contacts.*/
 		jos.flush();
 		System.out.println("Printing contacts as in the set....");
 		jos.addNewContact("Newton", "Notes");
+		jos.printContacts();
+		System.out.println("Printing contacts with the string ll....");
+		jos.printContacts(jos.getContacts("Pa"));
+		System.out.println("Checking they are still in Set contacts....");
 		jos.printContacts();
 
 		/**newContact = new ContactImpl("Will","Wills notes.");
