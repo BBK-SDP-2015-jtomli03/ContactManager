@@ -11,4 +11,20 @@ public class MeetingImpl{
 		this.date = date;
 		this.contacts = contacts;
 	}
+
+//returns the meeting ID
+	public int getId(){
+		return id;
+	}
+
+//returns the date of the meeting
+	public Calendar getDate(){
+		return date;
+	}
+
+//returns the details of the people that attended the meeting
+	public Set<Contact> getContacts(){
+		return contacts;
+	}
+
 }
