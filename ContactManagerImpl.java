@@ -117,11 +117,8 @@ adds it to the Hashset contacts.*/
 
 //Prints the list of contacts
 	private void printContacts(){
-		for (Contact contact: contacts){
-			int id = contact.getId();
-			String name = contact.getName();
-			String notes = contact.getNotes();
-			System.out.println(id + ", " + name + ", " + notes);	
+		for (Contact contact: contacts){	
+			System.out.println(contact.toString());
 		}
 	}
 
@@ -145,10 +142,10 @@ adds it to the Hashset contacts.*/
 		ContactManagerImpl jos = new ContactManagerImpl("/Users/Jo/Documents/contacts.txt");
 		jos.getData();
 		jos.printContacts();
-		System.out.println(jos.getFileName());
-		ContactImpl contact = new ContactImpl(3,"Jon","Jons notes.");
-		jos.addContactToSet(contact);
-		jos.printContacts();
+		//System.out.println(jos.getFileName());
+		//ContactImpl contact = new ContactImpl(3,"Jon","Jons notes.");
+		//jos.addContactToSet(contact);
+		//jos.printContacts();
 		//contact.addNotes("Has this added??");
 		//jos.writeContactToFile(contact);
 		
