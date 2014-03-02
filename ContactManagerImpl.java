@@ -185,6 +185,12 @@ adds it to the Hashset contacts.*/
 		return this.fileName;
 	}
 
+//creates a new contact and adds them to the set
+	private void addNewContact(String name, String notes){
+		ContactImpl newContact = new ContactImpl(getNewContactID(),name, notes);
+		addContactToSet(newContact);
+	}
+
 //adds contacts to Set<Contact>
 	private void addContactToSet(Contact contact){
 		contacts.add(contact);
@@ -227,6 +233,7 @@ adds it to the Hashset contacts.*/
 		System.out.println("Writing data to file again.....");
 		jos.writeContactsToFile();
 		System.out.println("Printing contacts as in the set....");
+		jos.addNewContact("Newton", "Notes");
 		jos.printContacts();
 
 		/**newContact = new ContactImpl("Will","Wills notes.");
