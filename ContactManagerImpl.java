@@ -24,7 +24,46 @@ public class ContactManagerImpl{
 		return contacts;
 	}
 
-//writes a contact to the file
+//returns a unique contact ID
+	private int getNewContactID(){
+		int max = 0;
+		if (contacts.isEmpty()){
+			return 1;
+		}
+		else{
+			for(Contact contact : contacts){
+				if (contact.getId() > max){
+					max = contact.getId();
+				}
+			}
+			return max + 1;
+		}
+	}
+
+//writes all contacts to the file
+	private void writeContactsToFile(){
+		PrintWriter out = null;
+		try{
+			File file = new File(getFileName());
+			out = new PrintWriter(new FileWriter(file, false));
+			for(Contact contact : contacts){
+				String line = "c," + contact.getId() + "," + contact.getName() + "," + contact.getNotes() + "\r\n";
+				out.write(line);
+			}
+			out.flush();
+		}catch (FileNotFoundException ex){
+			System.out.println("Cannot write to file " + getFileName());
+		}catch (IOException ex){
+			ex.printStackTrace();
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		finally {
+			out.close();
+		}
+	}
+
+/**writes a contact to the file
 	private void writeContactToFile(ContactImpl contact){
 		PrintWriter out = null;
 		try{
@@ -32,6 +71,7 @@ public class ContactManagerImpl{
 			out = new PrintWriter(new FileWriter(file, true));
 			String line = "c," + contact.getId() + "," + contact.getName() + "," + contact.getNotes() + "\r\n";
 			out.write(line);
+		
 			contacts.clear();
 			out.flush();
 		}catch (FileNotFoundException ex){
@@ -45,7 +85,7 @@ public class ContactManagerImpl{
 			out.close();
 		}
 
-	}
+	}*/
 
 
 
@@ -99,10 +139,8 @@ public class ContactManagerImpl{
 adds it to the Hashset contacts.*/
 	private void createContact(String line){
 		String[] contactArray = line.split(",");
-
 		String contact = "c";
 		String meeting = "m";
-
 		/**if there are no notes in the txt document for this contact/meeting, 
 		this prevents an exception by initialising the notes/meeting*/
 		if(contactArray[3].length() == 0){
@@ -110,22 +148,28 @@ adds it to the Hashset contacts.*/
 		}
 
 		if(contactArray[0].equals(contact)){
-		
 			Contact newContact = new ContactImpl(Integer.parseInt(contactArray[1]), contactArray[2], contactArray[3]);
-			//for (Contact contactInContacts: contacts){
-			//	if(newContact.getId()== contactInContacts.getId()){
-			//		newContact = contactInContacts;
-			//	}
-			//	else{
-					contacts.add(newContact);
-				//}
-			//}
+			if(contacts.isEmpty()){
+				contacts.add(newContact);
+			}
+			else if(!containsContact(contacts, newContact)){
+				contacts.add(newContact);
+			}
 		}
 
 		if(contactArray[0].equals(meeting)){
 
 		}
+	}
 
+//checks to see if the contact is already in the set
+	private boolean containsContact(Set<Contact> contactList, Contact newContact){
+		for(Contact contactInContacts : contactList){
+					if(newContact.getId() == contactInContacts.getId()){
+						return true;
+					}
+		}
+		return false;
 	}
 
 //Prints the list of contacts
@@ -153,17 +197,46 @@ adds it to the Hashset contacts.*/
 		//jos.printContacts();
 		//System.out.println(jos.getFileName());
 		//contact.addNotes("Has this added??");
-		ContactImpl newContact = new ContactImpl("Jon","Jons notes.");
+
+		ContactImpl newContact = new ContactImpl(jos.getNewContactID(),"Andy"," notes.");
 		jos.addContactToSet(newContact);
-		jos.writeContactToFile(newContact);
-		newContact = new ContactImpl("Jeff","Jeffs notes.");
+		newContact = new ContactImpl(jos.getNewContactID(),"Bill"," notes.");
 		jos.addContactToSet(newContact);
-		jos.writeContactToFile(newContact);
-		newContact = new ContactImpl("Jake","Jakes notes.");
+		newContact = new ContactImpl(jos.getNewContactID(),"Callum"," notes.");
 		jos.addContactToSet(newContact);
-		jos.writeContactToFile(newContact);
+		System.out.println("Printing before writing.....");
+		jos.printContacts();
+		jos.writeContactsToFile();
+		System.out.println("Have written the contacts to file.....");
+		jos.printContacts();
+		jos.getData();
+		System.out.println("Have now got the data back from the file.....");
+		jos.printContacts();
+		System.out.println("Adding new contacts to the set, writing to file......");
+		newContact = new ContactImpl(jos.getNewContactID(),"Jake"," notes.");
+		jos.addContactToSet(newContact);
+		newContact = new ContactImpl(jos.getNewContactID(),"Liam"," notes.");
+		jos.addContactToSet(newContact);
+		newContact = new ContactImpl(jos.getNewContactID(),"Pablo"," notes.");
+		jos.addContactToSet(newContact);
+		jos.writeContactsToFile();
+		jos.printContacts();
+		System.out.println("Getting data again.....");
 		jos.getData();
 		jos.printContacts();
+		System.out.println("Writing data to file again.....");
+		jos.writeContactsToFile();
+		System.out.println("Printing contacts as in the set....");
+		jos.printContacts();
+
+		/**newContact = new ContactImpl("Will","Wills notes.");
+		jos.addContactToSet(newContact);
+		System.out.println("Testing to see whether Will has a unique ID....");
+		jos.printContacts();
+		jos.writeContactToFile(newContact);
+		System.out.println("Will should be written to the file and then we have him back again....");
+		jos.getData();
+		jos.printContacts();*/
 
 		
 
