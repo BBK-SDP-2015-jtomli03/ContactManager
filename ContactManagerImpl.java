@@ -1,6 +1,7 @@
 import java.util.*;
 import java.io.*;
 import java.lang.String;
+import java.util.Calendar;
 
 
 public class ContactManagerImpl{
@@ -20,22 +21,9 @@ public class ContactManagerImpl{
 		this.fileName = fileName;
 	}
 
-
-
-//returns a unique contact ID
-	private int getNewContactID(){
-		int max = 0;
-		if (contacts.isEmpty()){
-			return 1;
-		}
-		else{
-			for(Contact contact : contacts){
-				if (contact.getId() > max){
-					max = contact.getId();
-				}
-			}
-			return max + 1;
-		}
+//gets the filename
+	private String getFileName(){
+		return this.fileName;
 	}
 
 //Saves all data to the file
@@ -160,6 +148,24 @@ adds it to the Hashset contacts.*/
 		}
 	}
 
+/*******************CONTACTS********************************/
+
+//returns a unique contact ID
+	private int getNewContactId(){
+		int max = 0;
+		if (contacts.isEmpty()){
+			return 1;
+		}
+		else{
+			for(Contact contact : contacts){
+				if (contact.getId() > max){
+					max = contact.getId();
+				}
+			}
+			return max + 1;
+		}
+	}
+
 //checks to see if the contact is already in the set
 	private boolean containsContact(Set<Contact> contactList, Contact newContact){
 		for(Contact contactInContacts : contactList){
@@ -185,14 +191,9 @@ adds it to the Hashset contacts.*/
 	}
 
 
-//gets the filename
-	private String getFileName(){
-		return this.fileName;
-	}
-
 //creates a new contact and adds them to the set
 	private void addNewContact(String name, String notes){
-		ContactImpl newContact = new ContactImpl(getNewContactID(),name, notes);
+		ContactImpl newContact = new ContactImpl(getNewContactId(),name, notes);
 		addContactToSet(newContact);
 	}
 
@@ -238,6 +239,51 @@ adds it to the Hashset contacts.*/
 		return contactsWithId;
 	}
 
+/********************MEETINGS*********************/	
+
+
+//add a future meeting
+	private int addFutureMeeting(Set<Contact> contacts, Calendar date){
+		Meeting newMeeting = new MeetingImpl(getNewMeetingId(), date, contacts);
+		meetings.add(newMeeting);
+		return newMeeting.getId();
+	}
+
+//returns a unique meeting ID
+	private int getNewMeetingId(){
+		int max = 0;
+		if (meetings.isEmpty()){
+			return 1;
+		}
+		else{
+			for(Meeting meeting : meetings){
+				if (meeting.getId() > max){
+					max = meeting.getId();
+				}
+			}
+			return max + 1;
+		}
+	}
+
+//Prints the list of meetings
+	private void printMeetings(){
+		for (Meeting meeting: meetings){	
+			System.out.println(meeting.toString());
+		}
+	}
+
+//returns a meeting by ID
+	private Meeting getMeeting(int id){
+		for(Meeting meeting : meetings){
+			if(meeting.getId() == id){
+				return meeting;
+			}
+		}
+		return null;
+	}
+
+
+
 //main method
 	public static void main(String[] args){
 		ContactManagerImpl jos = new ContactManagerImpl("/Users/Jo/Documents/contacts.txt");
@@ -245,14 +291,14 @@ adds it to the Hashset contacts.*/
 		//jos.printContacts();
 		//System.out.println(jos.getFileName());
 
-		/**ContactImpl newContact = new ContactImpl(jos.getNewContactID(),"Andy"," notes.");
+		/**ContactImpl newContact = new ContactImpl(jos.getNewContactId(),"Andy"," notes.");
 		jos.addContactToSet(newContact);
-		newContact = new ContactImpl(jos.getNewContactID(),"Bill"," notes.");
+		newContact = new ContactImpl(jos.getNewContactId(),"Bill"," notes.");
 		jos.addContactToSet(newContact);
-		newContact = new ContactImpl(jos.getNewContactID(),"Callum"," notes.");
+		newContact = new ContactImpl(jos.getNewContactId(),"Callum"," notes.");
 		jos.addContactToSet(newContact);
 		System.out.println("Printing before writing.....");*/
-		jos.printContacts();
+		//jos.printContacts();
 		/**jos.flush();
 		System.out.println("Have written the contacts to file.....");
 		jos.printContacts();
@@ -260,11 +306,11 @@ adds it to the Hashset contacts.*/
 		System.out.println("Have now got the data back from the file.....");
 		jos.printContacts();
 		System.out.println("Adding new contacts to the set, writing to file......");
-		newContact = new ContactImpl(jos.getNewContactID(),"Jake"," notes.");
+		newContact = new ContactImpl(jos.getNewContactId(),"Jake"," notes.");
 		jos.addContactToSet(newContact);
-		newContact = new ContactImpl(jos.getNewContactID(),"Liam"," notes.");
+		newContact = new ContactImpl(jos.getNewContactId(),"Liam"," notes.");
 		jos.addContactToSet(newContact);
-		newContact = new ContactImpl(jos.getNewContactID(),"Pablo"," notes.");
+		newContact = new ContactImpl(jos.getNewContactId(),"Pablo"," notes.");
 		jos.addContactToSet(newContact);
 		jos.flush();
 		jos.printContacts();
@@ -291,10 +337,33 @@ adds it to the Hashset contacts.*/
 		System.out.println("Will should be written to the file and then we have him back again....");
 		jos.getData();
 		jos.printContacts();*/
-		System.out.println("Should print contacts 1, 2, and 5!");
-		jos.printContacts(jos.getContacts(1,2,5));
-		System.out.println("Checking they are still in Set contacts....");
-		jos.printContacts();
+		//System.out.println("Should print contacts 1, 2, and 5!");
+		//jos.printContacts(jos.getContacts(1,2,5));
+		//System.out.println("Checking they are still in Set contacts....");
+		//jos.printContacts();
+
+		/**Calendar calendar = new GregorianCalendar();
+		Calendar date = new GregorianCalendar(2014, Calendar.MARCH, 03);
+    	System.out.println(calendar.getTime());
+    	date.set(2015, 0, 21);
+    	System.out.println(date.getTime());
+    	if(calendar.getTime().before(date.getTime())){
+    		System.out.println("Date is before!!");
+    	}
+    	Calendar now = Calendar.getInstance();
+    	System.out.println(now.getTime());
+    	now.set(2020, 2, 20, 12, 00);
+    	System.out.println(now.getTime());*/
+
+    	System.out.println("Printing a list of meetings.....");
+    	Calendar dateOfMeeting = new GregorianCalendar(2014, 2, 20, 12, 00);
+    	jos.addFutureMeeting(jos.getContacts(1,2,3), dateOfMeeting);
+    	Calendar anotherMeeting = new GregorianCalendar(2014, 11, 20, 12, 00);
+    	jos.addFutureMeeting(jos.getContacts(5,2,3), anotherMeeting);
+    	jos.printMeetings();
+    	System.out.println(jos.getMeeting(1));
+
+		
 
 		
 

@@ -1,15 +1,20 @@
 import java.util.Calendar;
 import java.util.Set;
 
-public class MeetingImpl{
+public class MeetingImpl implements Meeting{
 	private int id;
 	private Calendar date;
-	Set<Contact> contacts;
+	private Set<Contact> contacts;
+	
 
 	public MeetingImpl(int id, Calendar date, Set<Contact> contacts){
 		this.id = id;
 		this.date = date;
 		this.contacts = contacts;
+	}
+
+	public MeetingImpl(){
+		
 	}
 
 //returns the meeting ID
@@ -26,5 +31,16 @@ public class MeetingImpl{
 	public Set<Contact> getContacts(){
 		return contacts;
 	}
+
+//returns each meetings details as a String
+	@Override
+	public String toString(){
+		String contactsInMeeting = " ";
+		for(Contact contact: contacts){
+			contactsInMeeting = contactsInMeeting + "\n" + contact.toString();
+		}
+		return "Meeting ID " + id + " on; " + date.getTime() + "\n" + "Contacts;" + contactsInMeeting + "\n";
+	}
+
 
 }
