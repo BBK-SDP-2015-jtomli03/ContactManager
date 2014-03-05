@@ -5,32 +5,27 @@ import java.util.Calendar;
 
 
 public class ContactManagerImpl{
-	private String fileName = "";
+	private static final String FILENAME = "contacts.txt";
 	private List<Meeting> meetings = new ArrayList<Meeting>();
 	private Set<Contact> contacts = new HashSet<Contact>();
 
 
-	public ContactManagerImpl(String fileName, List<Meeting> meetings, Set<Contact> contacts){
-		this.fileName = fileName;
-		this.meetings = meetings;
-		this.contacts = contacts;
+	public ContactManagerImpl(){
+		try{
+			if (!new File(FILENAME).createNewFile()){
+				getData();
+			}  
+		} catch (IOException ioe) {
+      	ioe.printStackTrace();
+    	}		
 	}
 
-//empty constructor for testing******************************************
-	public ContactManagerImpl(String fileName){
-		this.fileName = fileName;
-	}
-
-//gets the filename
-	private String getFileName(){
-		return this.fileName;
-	}
 
 //Saves all data to the file
 	private void flush(){
 		PrintWriter out = null;
 		try{
-			File file = new File(getFileName());
+			File file = new File(FILENAME);
 			out = new PrintWriter(new FileWriter(file, false));
 			for(Contact contact : contacts){
 				String line = "c," + contact.getId() + "," + contact.getName() + "," + contact.getNotes() + "\r\n";
@@ -38,7 +33,7 @@ public class ContactManagerImpl{
 			}
 			out.flush();
 		}catch (FileNotFoundException ex){
-			System.out.println("Cannot write to file " + getFileName());
+			System.out.println("Cannot write to file " + FILENAME);
 		}catch (IOException ex){
 			ex.printStackTrace();
 		}catch (Exception e){
@@ -49,37 +44,13 @@ public class ContactManagerImpl{
 		}
 	}
 
-/**writes a contact to the file
-	private void writeContactToFile(ContactImpl contact){
-		PrintWriter out = null;
-		try{
-			File file = new File(getFileName());
-			out = new PrintWriter(new FileWriter(file, true));
-			String line = "c," + contact.getId() + "," + contact.getName() + "," + contact.getNotes() + "\r\n";
-			out.write(line);
-		
-			contacts.clear();
-			out.flush();
-		}catch (FileNotFoundException ex){
-			System.out.println("Cannot write to file " + getFileName());
-		}catch (IOException ex){
-			ex.printStackTrace();
-		}catch (Exception e){
-			e.printStackTrace();
-		}
-		finally {
-			out.close();
-		}
-
-	}*/
-
 
 
 
 //gets the data from the file and transfers it to list<Meeting> and Set<Contact>
 	private void getData(){
 
-		File file = new File (this.fileName);
+		File file = new File (FILENAME);
 		BufferedReader in = null;
 		try
 		{
@@ -286,8 +257,9 @@ adds it to the Hashset contacts.*/
 
 //main method
 	public static void main(String[] args){
-		ContactManagerImpl jos = new ContactManagerImpl("/Users/Jo/Documents/contacts.txt");
-		jos.getData();
+		ContactManagerImpl jos = new ContactManagerImpl();
+		//ContactManagerImpl jos = new ContactManagerImpl();
+		//jos.getData();
 		//jos.printContacts();
 		//System.out.println(jos.getFileName());
 
@@ -355,13 +327,23 @@ adds it to the Hashset contacts.*/
     	now.set(2020, 2, 20, 12, 00);
     	System.out.println(now.getTime());*/
 
-    	System.out.println("Printing a list of meetings.....");
-    	Calendar dateOfMeeting = new GregorianCalendar(2014, 2, 20, 12, 00);
-    	jos.addFutureMeeting(jos.getContacts(1,2,3), dateOfMeeting);
-    	Calendar anotherMeeting = new GregorianCalendar(2014, 11, 20, 12, 00);
-    	jos.addFutureMeeting(jos.getContacts(5,2,3), anotherMeeting);
+    	/**System.out.println("Printing a list of meetings.....");*/
+    	//Calendar dateOfMeeting = new GregorianCalendar(2014, 2, 20, 12, 00);
+    	//jos.addFutureMeeting(jos.getContacts(1,2,3), dateOfMeeting);
+    	//System.out.println(jos.getMeeting(1));
+    	//Calendar anotherMeeting = new GregorianCalendar(2014, 11, 20, 12, 00);
+    	/*jos.addFutureMeeting(jos.getContacts(5,2,3), anotherMeeting);
     	jos.printMeetings();
-    	System.out.println(jos.getMeeting(1));
+    	System.out.println(jos.getMeeting(1));*/
+    		
+    	
+    	//String notesForMeeting = "Will this work???";
+    	//Meeting pastMeeting = new PastMeetingImpl(jos.getNewMeetingId(), anotherMeeting, jos.getContacts(1,2), notesForMeeting);
+    	//jos.meetings.add(pastMeeting); 
+    	//jos.printMeetings();
+    	//System.out.println(jos.getMeeting(2));
+    	
+    	
 
 		
 
