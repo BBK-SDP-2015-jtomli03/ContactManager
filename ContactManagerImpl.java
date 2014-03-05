@@ -269,9 +269,9 @@ adds it to the Hashset contacts.*/
 		jos.addContactToSet(newContact);
 		newContact = new ContactImpl(jos.getNewContactId(),"Callum"," notes.");
 		jos.addContactToSet(newContact);
-		System.out.println("Printing before writing.....");*/
-		//jos.printContacts();
-		/**jos.flush();
+		System.out.println("Printing before writing.....");
+		jos.printContacts();
+		jos.flush();
 		System.out.println("Have written the contacts to file.....");
 		jos.printContacts();
 		jos.getData();
@@ -312,7 +312,7 @@ adds it to the Hashset contacts.*/
 		//System.out.println("Should print contacts 1, 2, and 5!");
 		//jos.printContacts(jos.getContacts(1,2,5));
 		//System.out.println("Checking they are still in Set contacts....");
-		//jos.printContacts();
+		jos.printContacts();
 
 		/**Calendar calendar = new GregorianCalendar();
 		Calendar date = new GregorianCalendar(2014, Calendar.MARCH, 03);

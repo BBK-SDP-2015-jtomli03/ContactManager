@@ -1,7 +1,7 @@
 import java.util.Calendar;
 import java.util.Set;
 
-public class MeetingImpl implements Meeting{
+public abstract class MeetingImpl implements Meeting{
 	private int id;
 	private Calendar date;
 	private Set<Contact> contacts;
@@ -11,10 +11,6 @@ public class MeetingImpl implements Meeting{
 		this.id = id;
 		this.date = date;
 		this.contacts = contacts;
-	}
-
-	public MeetingImpl(){
-		
 	}
 
 //returns the meeting ID
