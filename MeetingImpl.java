@@ -7,7 +7,6 @@ public abstract class MeetingImpl implements Meeting, Comparable<Meeting>{
 	private Set<Contact> contacts;
 	
 	
-
 	public MeetingImpl(int id, Calendar date, Set<Contact> contacts){
 		this.id = id;
 		this.date = date;
