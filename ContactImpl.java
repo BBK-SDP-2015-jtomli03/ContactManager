@@ -40,11 +40,4 @@ public class ContactImpl implements Contact{
 		notes = completeNotes;
 	}
 
-//returns each contacts details as a String
-	@Override
-	public String toString(){
-		return "ID;" + id + " Name; " + name + " Notes;" + notes;
-	}
-
-
 }

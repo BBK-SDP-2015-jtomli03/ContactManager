@@ -37,9 +37,9 @@ public class ContactManagerImpl implements ContactManager{
 				out.write(line);
 			}
 			for(Meeting meeting : meetings){
-				MeetingImpl downCastMeeting = (MeetingImpl) meeting;
-				PastMeeting meetingWithNotes = (PastMeeting) downCastMeeting;
-				line = "m," + meetingWithNotes.getId() + "," + meetingWithNotes.getDate() + "," + contactIdsToString(meetingWithNotes) + "," + meetingWithNotes.getNotes() + "\r\n";
+				MeetingImpl meetingImpl = (MeetingImpl) meeting;
+				line = "m," + meetingImpl.getId() + "," + meetingImpl.getDate() + "," + contactIdsToString(meetingImpl) + "," + meetingImpl.getNotes() + "\r\n";
+				out.write(line);
 			}
 			out.flush();
 		}catch (FileNotFoundException ex){
@@ -137,65 +137,6 @@ adds it to the Hashset contacts.*/
 		}
 	}
 
-/*******************CONTACTS********************************/
-
-//returns a unique contact ID
-	private int getNewContactId(){
-		int max = 0;
-		if (contacts.isEmpty()){
-			return 1;
-		}
-		else{
-			for(Contact contact : contacts){
-				if (contact.getId() > max){
-					max = contact.getId();
-				}
-			}
-			return max + 1;
-		}
-	}
-
-//checks to see whether ContactManager contains this contact in the contacts list
-	private boolean containsContact(Set<Contact> contactList, Contact newContact){
-		for(Contact contactInContacts : contactList){
-					if(newContact.getId() == contactInContacts.getId()){
-						return true;
-					}
-		}
-		return false;
-	}
-
-//checks whether a contact exists in the given set
-	private boolean contactsExistIn(Set<Contact> contacts){
-		for (Contact contactInContacts : contacts){
-				if (!containsContact(this.contacts, contactInContacts)) {
-					return false;
-				}
-			}
-		return true;
-	}
-
-//Prints the list of contacts
-	private void printContacts(){
-		for (Contact contact: contacts){	
-			System.out.println(contact.toString());
-		}
-	}
-
-//Prints the list of contacts in the Set contactsWithString
-	private void printContacts(Set<Contact> contactsWithString){
-		for (Contact contact: contactsWithString){	
-			System.out.println(contact.toString());
-		}
-	}
-
-
-
-
-//adds contacts to Set<Contact>
-	private void addContactToSet(Contact contact){
-		contacts.add(contact);
-	}
 
 //add a future meeting
 	@Override
@@ -394,6 +335,23 @@ adds it to the Hashset contacts.*/
 		}
 	}
 
+
+//returns a unique contact ID
+	private int getNewContactId(){
+		int max = 0;
+		if (contacts.isEmpty()){
+			return 1;
+		}
+		else{
+			for(Contact contact : contacts){
+				if (contact.getId() > max){
+					max = contact.getId();
+				}
+			}
+			return max + 1;
+		}
+	}
+
 //returns all the meetings on a particular date in chronological order
     private List<MeetingImpl> getAllMeetings(Calendar date){
     	int dayOfYear = date.get(Calendar.DAY_OF_MONTH) + date.get(Calendar.MONTH) + date.get(Calendar.YEAR);
@@ -435,26 +393,30 @@ adds it to the Hashset contacts.*/
 		return null;
 	}
 
-
- 	
-
-	
-
-  
-
-   
-
-
-
-//Prints the list of meetings
-	private void printMeetings(){
-		for (Meeting meeting: meetings){	
-			System.out.println(meeting.toString());
+//checks to see whether ContactManager contains this contact in the contacts list
+	private boolean containsContact(Set<Contact> contactList, Contact newContact){
+		for(Contact contactInContacts : contactList){
+					if(newContact.getId() == contactInContacts.getId()){
+						return true;
+					}
 		}
+		return false;
 	}
 
+//checks whether a contact exists in the given set
+	private boolean contactsExistIn(Set<Contact> contacts){
+		for (Contact contactInContacts : contacts){
+				if (!containsContact(this.contacts, contactInContacts)) {
+					return false;
+				}
+			}
+		return true;
+	}
 
-
+//adds contacts to Set<Contact>
+	private void addContactToSet(Contact contact){
+		contacts.add(contact);
+	}
 
 
 

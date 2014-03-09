@@ -5,6 +5,7 @@ public abstract class MeetingImpl implements Meeting, Comparable<Meeting>{
 	private int id;
 	private Calendar date;
 	private Set<Contact> contacts;
+	private String notes = "";
 	
 	
 	public MeetingImpl(int id, Calendar date, Set<Contact> contacts){
@@ -45,17 +46,9 @@ public abstract class MeetingImpl implements Meeting, Comparable<Meeting>{
 		}
 	}
 
-	
-
-//returns each meetings details as a String
-	@Override
-	public String toString(){
-		String contactsInMeeting = " ";
-		for(Contact contact: contacts){
-			contactsInMeeting = contactsInMeeting + "\n" + contact.toString();
-		}
-		return "Meeting ID " + id + " on; " + date.getTime() + "Contacts;" + contactsInMeeting + "\n";
+//gets meetings empty notes
+	public String getNotes(){
+		return notes;
 	}
-
 
 }
