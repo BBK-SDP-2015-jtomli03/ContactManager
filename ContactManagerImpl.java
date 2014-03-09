@@ -304,6 +304,34 @@ adds it to the Hashset contacts.*/
 		}
 	}
 
+
+//adds notes to past meeting
+	@Override
+    public void addMeetingNotes(int id, String text) throws IllegalArgumentException, NullPointerException, IllegalStateException{
+    	Meeting meeting = getMeeting(id);
+    	if(text == null){
+    		throw new NullPointerException();
+    	}
+    	else if(meeting == null){
+    		throw new IllegalArgumentException();
+    	}
+		else if(meeting.getDate().getTime().after(currentTime.getTime())) throw new IllegalStateException();{
+			PastMeetingImpl pastMeeting = (PastMeetingImpl) meeting;
+			pastMeeting.setNotes(text);	
+		}
+    }
+
+//checks if a meeting exists
+ 	private boolean meetingExists(int id){
+		for(Meeting meeting : meetings){
+					if(meeting.getId() == id){
+						return true;
+					}
+		}
+		return false;
+	}
+
+
 //checks whether a contact exists in the set
 	private boolean contactsExistIn(Set<Contact> contacts){
 		for (Contact contactInContacts : contacts){
@@ -316,10 +344,7 @@ adds it to the Hashset contacts.*/
 
 
 
- 	@Override
-    public void addMeetingNotes(int id, String text) {
-
-    }
+ 	
 
 	 @Override
     public List<Meeting> getFutureMeetingList(Contact contact) {
@@ -453,6 +478,10 @@ adds it to the Hashset contacts.*/
     	jos.contactsExistIn(josContacts);
 
     	jos.printMeetings();
+    	
+    	jos.addMeetingNotes(2, "notes" );
+    	jos.printMeetings();
+    	
 
 
     	

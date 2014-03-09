@@ -19,7 +19,12 @@ public PastMeetingImpl(int id, Calendar date, Set<Contact> contacts, String note
 	@Override
 	public String getNotes(){
 		return notes;
-	}	
+	}
+
+//sets the notes for the meeting
+	public void setNotes(String notes){
+		this.notes = this.notes + " " + notes;
+	}
 	
 	
 }
