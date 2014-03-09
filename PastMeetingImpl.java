@@ -2,10 +2,16 @@ import java.util.Calendar;
 import java.util.Set;
 
 public class PastMeetingImpl extends MeetingImpl implements PastMeeting{
+	
 	private String notes = "";
 
-public PastMeetingImpl(FutureMeeting futureMeeting, String notes){
-		super(futureMeeting.getId(), futureMeeting.getDate(), futureMeeting.getContacts());
+public PastMeetingImpl(Meeting meeting, String notes){
+		super(meeting.getId(), meeting.getDate(), meeting.getContacts());
+		this.notes = notes;
+	}
+
+public PastMeetingImpl(int id, Calendar date, Set<Contact> contacts, String notes){
+		super(id, date, contacts);
 		this.notes = notes;
 	}
 
@@ -14,4 +20,6 @@ public PastMeetingImpl(FutureMeeting futureMeeting, String notes){
 	public String getNotes(){
 		return notes;
 	}	
+	
+	
 }

@@ -15,30 +15,29 @@ public class ContactImpl implements Contact{
 	}
 
 
-	public ContactImpl(){
-
-	}
-
-
 //gets the ID of the contact
+	@Override
 	public int getId(){
-		return this.id;
+		return id;
 	}
 
 //gets the name of the contact
+	@Override
 	public String getName(){
-		return this.name;
+		return name;
 	}
 
 //gets any notes relating to a contact
+	@Override
 	public String getNotes(){
-		return this.notes;
+		return notes;
 	}
 
 //adds notes to a contact
+	@Override
 	public void addNotes(String note){
-		String completeNotes = this.notes + " " + note;
-		this.notes = completeNotes;
+		String completeNotes = notes + " " + note;
+		notes = completeNotes;
 	}
 
 //returns each contacts details as a String

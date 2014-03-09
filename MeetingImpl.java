@@ -6,6 +6,7 @@ public abstract class MeetingImpl implements Meeting{
 	private Calendar date;
 	private Set<Contact> contacts;
 	
+	
 
 	public MeetingImpl(int id, Calendar date, Set<Contact> contacts){
 		this.id = id;
@@ -14,19 +15,24 @@ public abstract class MeetingImpl implements Meeting{
 	}
 
 //returns the meeting ID
+	@Override
 	public int getId(){
 		return id;
 	}
 
 //returns the date of the meeting
+	@Override
 	public Calendar getDate(){
 		return date;
 	}
 
 //returns the details of the people that attended the meeting
+	@Override
 	public Set<Contact> getContacts(){
 		return contacts;
 	}
+
+	
 
 //returns each meetings details as a String
 	@Override
@@ -35,7 +41,7 @@ public abstract class MeetingImpl implements Meeting{
 		for(Contact contact: contacts){
 			contactsInMeeting = contactsInMeeting + "\n" + contact.toString();
 		}
-		return "Meeting ID " + id + " on; " + date.getTime() + "\n" + "Contacts;" + contactsInMeeting + "\n";
+		return "Meeting ID " + id + " on; " + date.getTime() + "Contacts;" + contactsInMeeting + "\n";
 	}
 
 

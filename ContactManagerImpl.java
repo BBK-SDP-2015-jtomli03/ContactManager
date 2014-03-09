@@ -4,8 +4,9 @@ import java.lang.String;
 import java.util.Calendar;
 
 
-public class ContactManagerImpl{
+public class ContactManagerImpl implements ContactManager{
 	private static final String FILENAME = "contacts.txt";
+	Calendar currentTime = new GregorianCalendar();
 	private List<Meeting> meetings = new ArrayList<Meeting>();
 	private Set<Contact> contacts = new HashSet<Contact>();
 
@@ -22,7 +23,8 @@ public class ContactManagerImpl{
 
 
 //Saves all data to the file
-	private void flush(){
+	@Override
+	public void flush(){
 		PrintWriter out = null;
 		try{
 			File file = new File(FILENAME);
@@ -163,7 +165,8 @@ adds it to the Hashset contacts.*/
 
 
 //creates a new contact and adds them to the set
-	private void addNewContact(String name, String notes){
+	@Override
+	public void addNewContact(String name, String notes){
 		ContactImpl newContact = new ContactImpl(getNewContactId(),name, notes);
 		addContactToSet(newContact);
 	}
@@ -174,7 +177,8 @@ adds it to the Hashset contacts.*/
 	}
 
 //gets a contact whos name contains a particular string
-	private Set<Contact> getContacts(String name){
+	@Override
+	public Set<Contact> getContacts(String name){
 		Set<Contact> contactsWithString = new HashSet<Contact>();
 		int searchIndex = -1;
 		for(Contact contact : contacts){
@@ -197,7 +201,8 @@ adds it to the Hashset contacts.*/
 	}
 
 //returns a set of contacts corresponding to the ID's entered
-	private Set<Contact> getContacts(int... ids){
+	@Override
+	public Set<Contact> getContacts(int... ids){
 		Set<Contact> contactsWithId = new HashSet<Contact>();
 		for (Contact contact : contacts){
 			int numOfIds = ids.length;
@@ -212,13 +217,6 @@ adds it to the Hashset contacts.*/
 
 /********************MEETINGS*********************/	
 
-
-//add a future meeting
-	private int addFutureMeeting(Set<Contact> contacts, Calendar date){
-		Meeting newMeeting = new MeetingImpl(getNewMeetingId(), date, contacts);
-		meetings.add(newMeeting);
-		return newMeeting.getId();
-	}
 
 //returns a unique meeting ID
 	private int getNewMeetingId(){
@@ -236,15 +234,52 @@ adds it to the Hashset contacts.*/
 		}
 	}
 
-//Prints the list of meetings
-	private void printMeetings(){
-		for (Meeting meeting: meetings){	
-			System.out.println(meeting.toString());
+
+//add a future meeting
+	@Override
+	public int addFutureMeeting(Set<Contact> contacts, Calendar date) throws IllegalArgumentException{
+		if(date.getTime().before(currentTime.getTime())){
+			throw new IllegalArgumentException();
+		}
+		else if(!contactsExistIn(contacts))throw new IllegalArgumentException();{	
+		Meeting newMeeting = new FutureMeetingImpl(getNewMeetingId(), date, contacts);
+		meetings.add(newMeeting);			
+		return newMeeting.getId();
 		}
 	}
 
+
+//gets a past meeting by its ID
+	@Override
+	public PastMeeting getPastMeeting(int id) throws IllegalArgumentException{
+		Meeting meeting = getMeeting(id);
+		if(meeting == null){
+			return null;
+		}
+		else if(meeting.getDate().getTime().after(currentTime.getTime())) throw new IllegalArgumentException();{
+			PastMeeting pastMeeting = (PastMeeting) meeting;
+			return pastMeeting;
+		}
+	}
+
+
+//gets a future meeting by its ID
+	@Override
+	public FutureMeeting getFutureMeeting(int id) throws IllegalArgumentException{
+		Meeting meeting = getMeeting(id);
+		if(meeting == null){
+			return null;
+		}
+		else if(meeting.getDate().getTime().before(currentTime.getTime())) throw new IllegalArgumentException();{
+			FutureMeeting futureMeeting = (FutureMeeting) meeting;
+			return futureMeeting;
+		}
+	}
+
+
 //returns a meeting by ID
-	private Meeting getMeeting(int id){
+	@Override
+	public Meeting getMeeting(int id){
 		for(Meeting meeting : meetings){
 			if(meeting.getId() == id){
 				return meeting;
@@ -254,10 +289,73 @@ adds it to the Hashset contacts.*/
 	}
 
 
+//creates a new record for a meeting that has already taken place
+	@Override
+	public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) throws IllegalArgumentException, NullPointerException{
+		if(contacts == null || date == null || text == null) {
+			throw new NullPointerException();
+		}
+		else if (contacts.isEmpty()){
+			throw new IllegalArgumentException();
+		}
+		else if(!contactsExistIn(contacts)) throw new IllegalArgumentException();{
+			PastMeeting pastMeeting = new PastMeetingImpl(getNewMeetingId(), date, contacts, text);
+			meetings.add(pastMeeting);
+		}
+	}
+
+//checks whether a contact exists in the set
+	private boolean contactsExistIn(Set<Contact> contacts){
+		for (Contact contactInContacts : contacts){
+				if (!containsContact(this.contacts, contactInContacts)) {
+					return false;
+				}
+			}
+		return true;
+	}
+
+
+
+ 	@Override
+    public void addMeetingNotes(int id, String text) {
+
+    }
+
+	 @Override
+    public List<Meeting> getFutureMeetingList(Contact contact) {
+        return null;
+    }
+
+    @Override
+    public List<Meeting> getFutureMeetingList(Calendar date) throws NullPointerException {
+        return null;
+    }
+
+    @Override
+    public List<PastMeeting> getPastMeetingList(Contact contact) {
+        return null;
+    }
+
+
+
+//Prints the list of meetings
+	private void printMeetings(){
+		for (Meeting meeting: meetings){	
+			System.out.println(meeting.toString());
+		}
+	}
+
+
+
+
+
+
+
 
 //main method
 	public static void main(String[] args){
 		ContactManagerImpl jos = new ContactManagerImpl();
+
 		//ContactManagerImpl jos = new ContactManagerImpl();
 		//jos.getData();
 		//jos.printContacts();
@@ -312,37 +410,73 @@ adds it to the Hashset contacts.*/
 		//System.out.println("Should print contacts 1, 2, and 5!");
 		//jos.printContacts(jos.getContacts(1,2,5));
 		//System.out.println("Checking they are still in Set contacts....");
-		jos.printContacts();
+		//jos.printContacts();
 
-		/**Calendar calendar = new GregorianCalendar();
-		Calendar date = new GregorianCalendar(2014, Calendar.MARCH, 03);
-    	System.out.println(calendar.getTime());
+		//Calendar calendar = new GregorianCalendar();
+		Calendar date = new GregorianCalendar(2014, 10, 10, 10, 00);
+    	/*System.out.println(calendar.getTime());
     	date.set(2015, 0, 21);
     	System.out.println(date.getTime());
     	if(calendar.getTime().before(date.getTime())){
     		System.out.println("Date is before!!");
-    	}
-    	Calendar now = Calendar.getInstance();
-    	System.out.println(now.getTime());
-    	now.set(2020, 2, 20, 12, 00);
+    	}*/
+    	//Calendar calendarNow = Calendar.getInstance();
+    	//System.out.println(calendarNow.getTime());
+    	/*now.set(2020, 2, 20, 12, 00);
     	System.out.println(now.getTime());*/
 
-    	/**System.out.println("Printing a list of meetings.....");*/
-    	//Calendar dateOfMeeting = new GregorianCalendar(2014, 2, 20, 12, 00);
+    	//System.out.println("Printing a list of meetings.....");
+    	//Calendar dateOfMeeting = new GregorianCalendar(2014, 2, 6, 21, 24);
     	//jos.addFutureMeeting(jos.getContacts(1,2,3), dateOfMeeting);
     	//System.out.println(jos.getMeeting(1));
-    	//Calendar anotherMeeting = new GregorianCalendar(2014, 11, 20, 12, 00);
-    	/*jos.addFutureMeeting(jos.getContacts(5,2,3), anotherMeeting);
+    	Calendar anotherMeeting = new GregorianCalendar(2013, 11, 20, 12, 00);
+    	//jos.printContacts();
+    	int id = jos.addFutureMeeting(jos.getContacts(5,2,3), date);
+    	//System.out.println(id);
+    	//jos.printMeetings();
+    	//System.out.println(jos.getPastMeeting(1));
+    	//System.out.println(jos.getPastMeeting(1).getNotes());
+    	//jos.printMeetings();
+    	//jos.printMeetings();
+    	//System.out.println("adding past meeting.....");
+    	String string = "More notes!!!";
+    	
+    	
+    	Set<Contact> josContacts = new HashSet<Contact>();
+    	Contact numForty = new ContactImpl(40, "Jo", "Hello");
+    	//josContacts.add(numForty);
+    	josContacts.add(jos.getContact(1));
+    	jos.addNewPastMeeting(josContacts, anotherMeeting, string);
+    	
+    	
+    	System.out.println(jos.containsContact(jos.contacts, numForty));
+    	jos.contactsExistIn(josContacts);
+
     	jos.printMeetings();
-    	System.out.println(jos.getMeeting(1));*/
+
+
+    	
+    	
+    	//Set<Contact> newSet = new HashSet<Contact>();
+		//newSet.add(jos.getContact(1));
+    	//ContactImpl newContact = new ContactImpl(jos.getNewContactId(),"test"," notes.");
+    	//newSet.add(newContact);
+
+    	//System.out.println(jos.contactExists(newSet));
+    	//jos.printMeetings();
+    	//System.out.println(jos.getMeeting(3));
+    	//jos.getPastMeeting(3).getNotes();
+    	//System.out.println("Printing a list of meetings.....");
+    	//jos.printMeetings();
     		
     	
     	//String notesForMeeting = "Will this work???";
-    	//Meeting pastMeeting = new PastMeetingImpl(jos.getNewMeetingId(), anotherMeeting, jos.getContacts(1,2), notesForMeeting);
+    	//Meeting pastMeeting = new PastMeetingImpl();
     	//jos.meetings.add(pastMeeting); 
-    	//jos.printMeetings();
-    	//System.out.println(jos.getMeeting(2));
-    	
+    	/*jos.printMeetings();
+    	System.out.println(jos.getPastMeeting(2));*/
+
+    	//problem with changing from a future to a past and then printing getPastMeeting - cos thinks its still a future meeting??
     	
 
 		

@@ -30,4 +30,6 @@ public interface Meeting{
 	*@return the details of people that attended the meeting
 	*/
 	Set<Contact> getContacts();
+
 	}
+	
