@@ -38,7 +38,9 @@ public class ContactManagerImpl implements ContactManager{
 			}
 			for(Meeting meeting : meetings){
 				MeetingImpl meetingImpl = (MeetingImpl) meeting;
-				line = "m," + meetingImpl.getId() + "," + meetingImpl.getDate() + "," + contactIdsToString(meetingImpl) + "," + meetingImpl.getNotes() + "\r\n";
+				SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				String dateString = format.format(meetingImpl.getDate());
+				line = "m," + meetingImpl.getId() + "," + dateString + "," + contactIdsToString(meetingImpl) + "," + meetingImpl.getNotes() + "\r\n";
 				out.write(line);
 			}
 			out.flush();
