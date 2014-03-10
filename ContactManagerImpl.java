@@ -419,5 +419,4 @@ adds it to the Hashset contacts.*/
 	private void addContactToSet(Contact contact){
 		contacts.add(contact);
 	}
-
 }
