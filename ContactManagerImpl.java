@@ -1,5 +1,6 @@
 import java.util.*;
 import java.io.*;
+import java.text.*;
 import java.lang.String;
 import java.util.Calendar;
 import java.lang.Comparable;
@@ -12,17 +13,15 @@ public class ContactManagerImpl implements ContactManager{
 	private List<Meeting> meetings = new ArrayList<Meeting>();
 	private Set<Contact> contacts = new HashSet<Contact>();
 
-
-	public ContactManagerImpl(){
-		try{
-			if (!new File(FILENAME).createNewFile()){
-				getData();
-			}  
-		} catch (IOException ioe) {
-      	ioe.printStackTrace();
-    	}		
-	}
-
+public ContactManagerImpl(){
+	try{
+		if (!new File(FILENAME).createNewFile()){
+			getData();
+		}  
+	}catch (IOException ioe) {
+  	ioe.printStackTrace();
+   	}		
+}
 
 //Saves all data to the file
 	@Override
@@ -36,11 +35,8 @@ public class ContactManagerImpl implements ContactManager{
 				line = "c," + contact.getId() + "," + contact.getName() + "," + contact.getNotes() + "\r\n";
 				out.write(line);
 			}
-			for(Meeting meeting : meetings){
-				MeetingImpl meetingImpl = (MeetingImpl) meeting;
-				SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				String dateString = format.format(meetingImpl.getDate());
-				line = "m," + meetingImpl.getId() + "," + dateString + "," + contactIdsToString(meetingImpl) + "," + meetingImpl.getNotes() + "\r\n";
+			for(Meeting meeting : meetings){	
+				line = "m,"  + meeting.getId() + "," + getDateAsString(meeting) + "," + getMeetingNotes(meeting) + "," +  contactIdsToString(meeting) + "\r\n";
 				out.write(line);
 			}
 			out.flush();
@@ -56,20 +52,8 @@ public class ContactManagerImpl implements ContactManager{
 		}
 	}
 
-//returns a String of contact ids that were in a particular meeting
-	private String contactIdsToString(Meeting meeting){
-		String result = "";
-		Set<Contact> contactsInMeeting = meeting.getContacts();
-		for(Contact contact : contactsInMeeting){
-				result = result + contact.getId() + ",";
-		}
-		return result;
-	}
-
-
 //gets the data from the file and transfers it to list<Meeting> and Set<Contact>
 	private void getData(){
-
 		File file = new File (FILENAME);
 		BufferedReader in = null;
 		try
@@ -77,10 +61,8 @@ public class ContactManagerImpl implements ContactManager{
 			in = new BufferedReader(new FileReader(file));
 			String line;
 			while ((line = in.readLine()) != null)
-			{
-				
+			{	
 				createObject(line);
-
 			}
 		}
 		catch (FileNotFoundException ex)
@@ -112,33 +94,31 @@ public class ContactManagerImpl implements ContactManager{
 		}
 	}
 
-/**Once a line is read from the file this method splits the different variables and creates an object of type Contact and
-adds it to the Hashset contacts.*/
+/**Once a line is read from the file this method creates an object of type Contact 
+or type Meeting and adds it to the list of meetings or set of contacts.*/
 	private void createObject(String line){
 		String[] contactArray = line.split(",");
 		String contact = "c";
 		String meeting = "m";
-		/**if there are no notes in the txt document for this contact/meeting, 
-		this prevents an exception by initialising the notes/meeting*/
 		if(contactArray[3].length() == 0){
 			contactArray[3] = "";
 		}
-
 		if(contactArray[0].equals(contact)){
 			Contact newContact = new ContactImpl(Integer.parseInt(contactArray[1]), contactArray[2], contactArray[3]);
-			if(contacts.isEmpty()){
-				contacts.add(newContact);
-			}
-			else if(!containsContact(contacts, newContact)){
-				contacts.add(newContact);
-			}
+			addContact(newContact);
 		}
-
 		if(contactArray[0].equals(meeting)){
-
+			Calendar meetingCalendar = getCalendar(contactArray);
+         	if(meetingCalendar.getTime().before(currentTime.getTime())){
+         		Meeting pastMeeting = new PastMeetingImpl(Integer.parseInt(contactArray[1]), meetingCalendar, getContactsInMeeting(contactArray), contactArray[3]);
+         		addMeeting(pastMeeting);
+         	}
+         	else{
+         		Meeting futureMeeting = new FutureMeetingImpl(Integer.parseInt(contactArray[1]), meetingCalendar, getContactsInMeeting(contactArray));
+         		addMeeting(futureMeeting);
+         	}
 		}
 	}
-
 
 //add a future meeting
 	@Override
@@ -153,7 +133,6 @@ adds it to the Hashset contacts.*/
 		}
 	}
 
-
 //gets a past meeting by its ID
 	@Override
 	public PastMeeting getPastMeeting(int id) throws IllegalArgumentException{
@@ -166,7 +145,6 @@ adds it to the Hashset contacts.*/
 			return pastMeeting;
 		}
 	}
-
 
 //gets a future meeting by its ID
 	@Override
@@ -181,7 +159,6 @@ adds it to the Hashset contacts.*/
 		}
 	}
 
-
 //returns a meeting by ID
 	@Override
 	public Meeting getMeeting(int id){
@@ -192,7 +169,6 @@ adds it to the Hashset contacts.*/
 		}
 		return null;
 	}
-
 
 //returns the list of future meetings scheduled with this contact in chronological order
  	@Override
@@ -210,7 +186,6 @@ adds it to the Hashset contacts.*/
         return returnMeetings;
     }
 
-
 //returns the list of chronologically sorted meetings scheduled on this date
  	@Override
     public List<Meeting> getFutureMeetingList(Calendar date){
@@ -222,7 +197,6 @@ adds it to the Hashset contacts.*/
       	}
         return returnMeetings;
     }
-
 
 //returns the list of past meetings scheduled with this contact in chronological order
  	@Override
@@ -241,7 +215,6 @@ adds it to the Hashset contacts.*/
         return returnMeetings;
     }
 
-
 //creates a new record for a meeting that has already taken place
 	@Override
 	public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) throws IllegalArgumentException, NullPointerException{
@@ -256,7 +229,6 @@ adds it to the Hashset contacts.*/
 			meetings.add(pastMeeting);
 		}
 	}
-
 
 //adds notes to past meeting
 	@Override
@@ -320,6 +292,79 @@ adds it to the Hashset contacts.*/
 		return contactsWithString;
 	}
 
+//turns a meetings Calendar date into a string for storing in the txt file
+	private String getDateAsString(Meeting meeting){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String dateString = sdf.format(meeting.getDate().getTime());
+		return dateString;
+	}
+
+//gets the notes from a past meeting, and initialises notes for a future meeting to allow all meetings to be conveniently written to the txt file
+	private String getMeetingNotes(Meeting meeting){
+		String meetingNotes = " ";
+			if (meeting.getDate().getTime().before(currentTime.getTime())){
+				PastMeeting pastMeeting = (PastMeeting) meeting;
+				meetingNotes = pastMeeting.getNotes();
+			}
+		return meetingNotes;
+	}
+
+//returns a String of contact ids that were in a particular meeting
+	private String contactIdsToString(Meeting meeting){
+		String result = "";
+		int numOfContacts = 0;
+		Set<Contact> contactsInMeeting = meeting.getContacts();
+		for(Contact contact : contactsInMeeting){
+			numOfContacts ++;
+			result = result + contact.getId() + ",";
+		}
+		result = numOfContacts + "," + result;
+		return result;
+	}
+
+//adds a meeting already created to the meetings list
+	private void addMeeting(Meeting meeting){
+		if(meetings.isEmpty()){
+			meetings.add(meeting);
+		}
+		else if(!containsMeeting(meetings, meeting)){
+			meetings.add(meeting);
+		}
+	}
+
+//returns the Calendar time of a meeting from a txt file
+	private Calendar getCalendar(String[] contactArray){
+		Calendar meetingCalendar = Calendar.getInstance();
+		try{String dateAsString = contactArray[2];
+         	DateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+         	Date stringToDate = (Date)formatDate.parse(dateAsString);
+       		meetingCalendar.setTime(stringToDate);
+       	} catch (ParseException e){
+       		System.out.println("ParseException" + e);
+       	}
+       	return meetingCalendar;
+    }
+
+//gets the contacts in a meeting from the txt document and returns them as contact objects in a set
+	private Set<Contact> getContactsInMeeting(String[] contactArray){
+		Set<Contact> contactsInMeeting = new HashSet<Contact>();
+		int numberOfContacts = Integer.parseInt(contactArray[4]) + 4;
+		for(int count = 5; count <= numberOfContacts; count++){
+			int contactId = Integer.parseInt(contactArray[count]);
+			contactsInMeeting.add(getContact(contactId));
+		}
+		return contactsInMeeting;
+	}
+
+//add a contact read from the txt file to the ContactManager contacts
+	private void addContact(Contact contact){
+		if(contacts.isEmpty()){
+			contacts.add(contact);
+		}
+		else if(!containsContact(contacts, contact)){
+			contacts.add(contact);
+		}
+	}
 
 //returns a unique meeting ID
 	private int getNewMeetingId(){
@@ -336,7 +381,6 @@ adds it to the Hashset contacts.*/
 			return max + 1;
 		}
 	}
-
 
 //returns a unique contact ID
 	private int getNewContactId(){
@@ -385,6 +429,16 @@ adds it to the Hashset contacts.*/
     	return meetingsWithContact;
     }
 
+//checks to see whether ContactManager contains this meeting in the meetings list
+	private boolean containsMeeting(List<Meeting> meetingList, Meeting newMeeting){
+		for(Meeting meetingInMeetings : meetingList){
+					if(newMeeting.getId() == meetingInMeetings.getId()){
+						return true;
+					}
+		}
+		return false;
+	}
+
 //returns a contact by ID
 	private Contact getContact(int id){
 		for(Contact contact : contacts){
@@ -419,4 +473,5 @@ adds it to the Hashset contacts.*/
 	private void addContactToSet(Contact contact){
 		contacts.add(contact);
 	}
+
 }

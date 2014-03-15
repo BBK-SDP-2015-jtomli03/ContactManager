@@ -5,7 +5,6 @@ public abstract class MeetingImpl implements Meeting, Comparable<Meeting>{
 	private int id;
 	private Calendar date;
 	private Set<Contact> contacts;
-	private String notes = "";
 	
 	
 	public MeetingImpl(int id, Calendar date, Set<Contact> contacts){
@@ -44,11 +43,6 @@ public abstract class MeetingImpl implements Meeting, Comparable<Meeting>{
 		else{
 			return 1;
 		}
-	}
-
-//gets meetings empty notes
-	public String getNotes(){
-		return notes;
 	}
 
 }

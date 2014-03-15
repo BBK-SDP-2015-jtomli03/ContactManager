@@ -2,7 +2,6 @@ import java.util.Calendar;
 import java.util.Set;
 
 public class PastMeetingImpl extends MeetingImpl implements PastMeeting{
-	
 	private String notes = "";
 
 public PastMeetingImpl(Meeting meeting, String notes){
@@ -24,7 +23,6 @@ public PastMeetingImpl(int id, Calendar date, Set<Contact> contacts, String note
 //sets the notes for the meeting
 	public void setNotes(String notes){
 		this.notes = this.notes + " " + notes;
-	}
-	
+	}	
 	
 }
