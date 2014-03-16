@@ -1,5 +1,6 @@
 import java.util.Calendar;
 import java.util.Set;
+import java.lang.Exception;
 
 public class PastMeetingImpl extends MeetingImpl implements PastMeeting{
 	private String notes = "";
@@ -14,15 +15,24 @@ public PastMeetingImpl(int id, Calendar date, Set<Contact> contacts, String note
 		this.notes = notes;
 	}
 
-//returns the notes from the meeting
-	@Override
-	public String getNotes(){
-		return notes;
-	}
 
-//sets the notes for the meeting
-	public void setNotes(String notes){
+@Override	
+public String getNotes(){
+	return notes;
+}
+
+/**
+*Sets the notes for a meeting
+*
+*@param String the notes to be set to the meeting
+*@throws IllegalArgumentexception if the notes are null
+*/
+public void setNotes(String notes)throws IllegalArgumentException{
+	if(notes == null){
+		throw new IllegalArgumentException("The notes are null.");
+	}else{
 		this.notes = this.notes + " " + notes;
-	}	
+	}
+}	
 	
 }

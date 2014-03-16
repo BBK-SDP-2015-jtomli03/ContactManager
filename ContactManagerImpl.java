@@ -15,7 +15,7 @@ public class ContactManagerImpl implements ContactManager{
 
 public ContactManagerImpl(){
 	try{
-		if (!new File(FILENAME).createNewFile()){
+		if(!new File(FILENAME).createNewFile()){
 			getData();
 		}  
 	}catch (IOException ioe) {
@@ -32,11 +32,11 @@ public ContactManagerImpl(){
 			File file = new File(FILENAME);
 			out = new PrintWriter(new FileWriter(file, false));
 			for(Contact contact : contacts){
-				line = "c," + contact.getId() + "," + contact.getName() + "," + contact.getNotes() + "\r\n";
+				line = "c|" + contact.getId() + "|" + contact.getName() + "|" + contact.getNotes() + "\r\n";
 				out.write(line);
 			}
 			for(Meeting meeting : meetings){	
-				line = "m,"  + meeting.getId() + "," + getDateAsString(meeting) + "," + getMeetingNotes(meeting) + "," +  contactIdsToString(meeting) + "\r\n";
+				line = "m|"  + meeting.getId() + "|" + getDateAsString(meeting) + "|" + getMeetingNotes(meeting) + "|" +  contactIdsToString(meeting) + "\r\n";
 				out.write(line);
 			}
 			out.flush();
@@ -52,79 +52,11 @@ public ContactManagerImpl(){
 		}
 	}
 
-//gets the data from the file and transfers it to list<Meeting> and Set<Contact>
-	private void getData(){
-		File file = new File (FILENAME);
-		BufferedReader in = null;
-		try
-		{
-			in = new BufferedReader(new FileReader(file));
-			String line;
-			while ((line = in.readLine()) != null)
-			{	
-				createObject(line);
-			}
-		}
-		catch (FileNotFoundException ex)
-		{
-			System.out.println("File" + file + " Does not exist.");
-		}
-		catch (IOException ex)
-		{
-			ex.printStackTrace();
-		}
-		finally
-		{
-			closeReader(in);
-		}
-	}
-
-//Closes the data source
-	private void closeReader(Reader reader){
-		try
-		{
-			if (reader != null)
-			{
-				reader.close();
-			}
-		}
-		catch (IOException ex)
-		{
-			ex.printStackTrace();
-		}
-	}
-
-/**Once a line is read from the file this method creates an object of type Contact 
-or type Meeting and adds it to the list of meetings or set of contacts.*/
-	private void createObject(String line){
-		String[] contactArray = line.split(",");
-		String contact = "c";
-		String meeting = "m";
-		if(contactArray[3].length() == 0){
-			contactArray[3] = "";
-		}
-		if(contactArray[0].equals(contact)){
-			Contact newContact = new ContactImpl(Integer.parseInt(contactArray[1]), contactArray[2], contactArray[3]);
-			addContact(newContact);
-		}
-		if(contactArray[0].equals(meeting)){
-			Calendar meetingCalendar = getCalendar(contactArray);
-         	if(meetingCalendar.getTime().before(currentTime.getTime())){
-         		Meeting pastMeeting = new PastMeetingImpl(Integer.parseInt(contactArray[1]), meetingCalendar, getContactsInMeeting(contactArray), contactArray[3]);
-         		addMeeting(pastMeeting);
-         	}
-         	else{
-         		Meeting futureMeeting = new FutureMeetingImpl(Integer.parseInt(contactArray[1]), meetingCalendar, getContactsInMeeting(contactArray));
-         		addMeeting(futureMeeting);
-         	}
-		}
-	}
-
 //add a future meeting
 	@Override
 	public int addFutureMeeting(Set<Contact> contacts, Calendar date) throws IllegalArgumentException{
 		if(date.getTime().before(currentTime.getTime())){
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Either the meeting date is in the past, or a contact is not in your contacts list.");
 		}
 		else if(!contactsExistIn(contacts))throw new IllegalArgumentException();{	
 		Meeting newMeeting = new FutureMeetingImpl(getNewMeetingId(), date, contacts);
@@ -140,7 +72,7 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
 		if(meeting == null){
 			return null;
 		}
-		else if(meeting.getDate().getTime().after(currentTime.getTime())) throw new IllegalArgumentException();{
+		else if(meeting.getDate().getTime().after(currentTime.getTime())) throw new IllegalArgumentException("This is a future meeting, not a past meeting.");{
 			PastMeeting pastMeeting = (PastMeeting) meeting;
 			return pastMeeting;
 		}
@@ -153,7 +85,7 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
 		if(meeting == null){
 			return null;
 		}
-		else if(meeting.getDate().getTime().before(currentTime.getTime())) throw new IllegalArgumentException();{
+		else if(meeting.getDate().getTime().before(currentTime.getTime())) throw new IllegalArgumentException("This is a past meeting, not a future meeting.");{
 			FutureMeeting futureMeeting = (FutureMeeting) meeting;
 			return futureMeeting;
 		}
@@ -174,7 +106,7 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
  	@Override
     public List<Meeting> getFutureMeetingList(Contact contact) throws IllegalArgumentException{
         if(!containsContact(this.contacts, contact)){
-        	throw new IllegalArgumentException();
+        	throw new IllegalArgumentException("This contact does not exist in your contacts.");
         }
       	List<Meeting> returnMeetings = new ArrayList<Meeting>();
       	List<MeetingImpl> sortedMeetings = getAllMeetings(contact);
@@ -189,7 +121,6 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
 //returns the list of chronologically sorted meetings scheduled on this date
  	@Override
     public List<Meeting> getFutureMeetingList(Calendar date){
-        
       	List<Meeting> returnMeetings = new ArrayList<Meeting>();
       	List<MeetingImpl> sortedMeetings = getAllMeetings(date);
       	for(MeetingImpl meeting : sortedMeetings){
@@ -202,7 +133,7 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
  	@Override
     public List<PastMeeting> getPastMeetingList(Contact contact) throws IllegalArgumentException{
         if(!containsContact(this.contacts, contact)){
-        	throw new IllegalArgumentException();
+        	throw new IllegalArgumentException("This contact does not exist in your contacts.");
         }
       	List<PastMeeting> returnMeetings = new ArrayList<PastMeeting>();
       	List<MeetingImpl> sortedMeetings = getAllMeetings(contact);
@@ -219,12 +150,12 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
 	@Override
 	public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) throws IllegalArgumentException, NullPointerException{
 		if(contacts == null || date == null || text == null) {
-			throw new NullPointerException();
+			throw new NullPointerException("Either your contacts, date, or notes are null.");
 		}
 		else if (contacts.isEmpty()){
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Your list of contacts is empty.");
 		}
-		else if(!contactsExistIn(contacts)) throw new IllegalArgumentException();{
+		else if(!contactsExistIn(contacts)) throw new IllegalArgumentException("This contact does not exist in your contacts.");{
 			PastMeeting pastMeeting = new PastMeetingImpl(getNewMeetingId(), date, contacts, text);
 			meetings.add(pastMeeting);
 		}
@@ -235,12 +166,12 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
     public void addMeetingNotes(int id, String text) throws IllegalArgumentException, NullPointerException, IllegalStateException{
     	Meeting meeting = getMeeting(id);
     	if(text == null){
-    		throw new NullPointerException();
+    		throw new NullPointerException("The notes are null.");
     	}
     	else if(meeting == null){
-    		throw new IllegalArgumentException();
+    		throw new IllegalArgumentException("This meeting does not exist.");
     	}
-		else if(meeting.getDate().getTime().after(currentTime.getTime())) throw new IllegalStateException();{
+		else if(meeting.getDate().getTime().after(currentTime.getTime())) throw new IllegalStateException("This meeting is a future meeting, not a past meeting.");{
 			PastMeetingImpl pastMeeting = (PastMeetingImpl) meeting;
 			pastMeeting.setNotes(text);	
 		}
@@ -250,7 +181,7 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
 	@Override
 	public void addNewContact(String name, String notes) throws NullPointerException{
 		if(name == null || notes == null){
-			throw new NullPointerException();
+			throw new NullPointerException("Either the name or notes are null.");
 		}
 		ContactImpl newContact = new ContactImpl(getNewContactId(),name, notes);
 		addContactToSet(newContact);
@@ -292,14 +223,103 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
 		return contactsWithString;
 	}
 
-//turns a meetings Calendar date into a string for storing in the txt file
+/**
+*Gets the data from the txt file, creates the contact and meeting objects, and adds them to List<Meeting> and Set<Contact>
+*/
+	private void getData(){
+		File file = new File (FILENAME);
+		BufferedReader in = null;
+		try
+		{
+			in = new BufferedReader(new FileReader(file));
+			String line;
+			while ((line = in.readLine()) != null)
+			{	
+				createObject(line);
+			}
+		}
+		catch (FileNotFoundException ex)
+		{
+			System.out.println("File" + file + " Does not exist.");
+		}
+		catch (IOException ex)
+		{
+			ex.printStackTrace();
+		}
+		finally
+		{
+			closeReader(in);
+		}
+	}
+
+/**
+*Closes the data source
+*
+*@param Reader the reader used to read the txt file
+*/
+	private void closeReader(Reader reader){
+		try
+		{
+			if (reader != null)
+			{
+				reader.close();
+			}
+		}
+		catch (IOException ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+
+/**
+*Once a line is read from the file this method creates an object of type Contact 
+*or type Meeting and adds it to the list of meetings or set of contacts.
+*
+*@param String the line read from the txt file
+*/
+	private void createObject(String line){
+		String[] contactArray = mySplit(line, "|");
+		String contact = "c";
+		String meeting = "m";
+		if(contactArray[3].length() == 0){
+			contactArray[3] = "";
+		}
+		if(contactArray[0].equals(contact)){
+			Contact newContact = new ContactImpl(Integer.parseInt(contactArray[1]), contactArray[2], contactArray[3]);
+			addContact(newContact);
+		}
+		if(contactArray[0].equals(meeting)){
+			Calendar meetingCalendar = getCalendar(contactArray);
+         	if(meetingCalendar.getTime().before(currentTime.getTime())){
+         		Meeting pastMeeting = new PastMeetingImpl(Integer.parseInt(contactArray[1]), meetingCalendar, getContactsInMeeting(contactArray), contactArray[3]);
+         		addMeeting(pastMeeting);
+         	}
+         	else{
+         		Meeting futureMeeting = new FutureMeetingImpl(Integer.parseInt(contactArray[1]), meetingCalendar, getContactsInMeeting(contactArray));
+         		addMeeting(futureMeeting);
+         	}
+		}
+	}
+
+/**
+*Converts a meetings Calendar date into a string for storing in the txt file
+*
+*@param Meeting the meeting for which the date is to be converted
+*@return String the calendar date in string format
+*/
 	private String getDateAsString(Meeting meeting){
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String dateString = sdf.format(meeting.getDate().getTime());
 		return dateString;
 	}
 
-//gets the notes from a past meeting, and initialises notes for a future meeting to allow all meetings to be conveniently written to the txt file
+/**
+*Gets the notes from a past meeting, and initialises notes for a future meeting to allow all meetings 
+*to be conveniently written to the txt file
+*
+*@param Meeting the meeting for which the notes are being written to txt file
+*@return String the meeting notes or an empty string if the meeting is a future meeting
+*/
 	private String getMeetingNotes(Meeting meeting){
 		String meetingNotes = " ";
 			if (meeting.getDate().getTime().before(currentTime.getTime())){
@@ -309,20 +329,29 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
 		return meetingNotes;
 	}
 
-//returns a String of contact ids that were in a particular meeting
+/**
+*Returns a String of contact ids that were in a particular meeting so that they can be stored in a txt file
+*
+*@param Meeting the meeting being saved to txt file
+*@return String a string of all the contacts id's that attended the meeting
+*/
 	private String contactIdsToString(Meeting meeting){
 		String result = "";
 		int numOfContacts = 0;
 		Set<Contact> contactsInMeeting = meeting.getContacts();
 		for(Contact contact : contactsInMeeting){
 			numOfContacts ++;
-			result = result + contact.getId() + ",";
+			result = result + contact.getId() + "|";
 		}
-		result = numOfContacts + "," + result;
+		result = numOfContacts + "|" + result;
 		return result;
 	}
 
-//adds a meeting already created to the meetings list
+/**
+*Adds a meeting object to the meetings list
+*
+*@param Meeting the meeting to be added to the meeting list
+*/
 	private void addMeeting(Meeting meeting){
 		if(meetings.isEmpty()){
 			meetings.add(meeting);
@@ -332,7 +361,13 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
 		}
 	}
 
-//returns the Calendar time of a meeting from a txt file
+/**
+*Converts a date and time in String format, to a Calendar date and time
+*
+*@param String[] the array in which the String format of the date/time is currently stored
+* NOTE; this will only work if the date/time String is at position [2] in the array.
+*@return Calendar the date/time of a meeting in calendar format
+*/
 	private Calendar getCalendar(String[] contactArray){
 		Calendar meetingCalendar = Calendar.getInstance();
 		try{String dateAsString = contactArray[2];
@@ -345,7 +380,14 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
        	return meetingCalendar;
     }
 
-//gets the contacts in a meeting from the txt document and returns them as contact objects in a set
+/**
+*Gets the contacts in a meeting from the array created from reading the txt document and returns them as contact objects in a set
+* NOTE; this will only work if the contacts start at position [5] in the array. Note; position [4] in the array gives us the number 
+*of contacts stored in the array to allow us to know how many there are that need to be added to the return set.
+*
+*@param String[] the array in which the id's of the contacts for a meeting are currently stored
+*@return Set<Contact> a set of contacts that attended the meeting
+*/
 	private Set<Contact> getContactsInMeeting(String[] contactArray){
 		Set<Contact> contactsInMeeting = new HashSet<Contact>();
 		int numberOfContacts = Integer.parseInt(contactArray[4]) + 4;
@@ -356,7 +398,11 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
 		return contactsInMeeting;
 	}
 
-//add a contact read from the txt file to the ContactManager contacts
+/**
+*Adds a contact to the ContactManagerImpl set of contacts
+*
+*@param Contact the contact to be added
+*/
 	private void addContact(Contact contact){
 		if(contacts.isEmpty()){
 			contacts.add(contact);
@@ -366,7 +412,11 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
 		}
 	}
 
-//returns a unique meeting ID
+/**
+*Returns a unique meeting ID
+*
+*@return int a unique meeting ID
+*/
 	private int getNewMeetingId(){
 		int max = 0;
 		if (meetings.isEmpty()){
@@ -382,7 +432,11 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
 		}
 	}
 
-//returns a unique contact ID
+/**
+* Returns a unique contact ID
+*
+* @return int a unique contact ID
+*/
 	private int getNewContactId(){
 		int max = 0;
 		if (contacts.isEmpty()){
@@ -398,7 +452,12 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
 		}
 	}
 
-//returns all the meetings on a particular date in chronological order
+/**
+* Returns all the meetings on a particular date in chronological order
+*
+* @param Calendar the date for which we want to get all scheduled meetings
+* @return List<MeetingImpl> a list of meetings on a particular date in chronological order by time
+*/
     private List<MeetingImpl> getAllMeetings(Calendar date){
     	int dayOfYear = date.get(Calendar.DAY_OF_MONTH) + date.get(Calendar.MONTH) + date.get(Calendar.YEAR);
     	List<MeetingImpl> meetingsOnDate = new ArrayList<MeetingImpl>();
@@ -414,7 +473,12 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
     	return meetingsOnDate;
     }
 
-//returns all the meetings with a particular contact in chronological order
+/**
+* Returns all the meetings with a particular contact in chronological order
+*
+* @param Contact the contact for which we want to view all meetings we have scheduled with them
+* @return List<MeetingImpl> the meetings scheduled with the contact in chronological order
+*/
     private List<MeetingImpl> getAllMeetings(Contact contact){
     	List<MeetingImpl> meetingsWithContact = new ArrayList<MeetingImpl>();
     	for(Meeting meeting : meetings){
@@ -429,7 +493,14 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
     	return meetingsWithContact;
     }
 
-//checks to see whether ContactManager contains this meeting in the meetings list
+/**
+* Checks to see whether a list of meetings contains a particular meeting (used to check if the meetings list in
+* ContactManagerImpl contains a particular meeting)
+* 
+* @param List<Meeting> the list of meetings to be checked to see if it contains a perticular meeting
+* @param Meeting the meeting we are checking to see is in the list of meetings
+* @return boolean true if the meetings list contains the meeting, and false if not
+*/
 	private boolean containsMeeting(List<Meeting> meetingList, Meeting newMeeting){
 		for(Meeting meetingInMeetings : meetingList){
 					if(newMeeting.getId() == meetingInMeetings.getId()){
@@ -439,7 +510,12 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
 		return false;
 	}
 
-//returns a contact by ID
+/**
+* Returns a contact by their contact ID
+*
+* @param int the contacts ID
+* @return Contact the contact corresponding to the contact ID
+*/
 	private Contact getContact(int id){
 		for(Contact contact : contacts){
 			if(contact.getId() == id){
@@ -449,7 +525,13 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
 		return null;
 	}
 
-//checks to see whether ContactManager contains this contact in the contacts list
+/**
+* Checks to see whether a set of contacts contain a particular contact (used to check whether ContactManagerImpl contains
+* a particular contact in the contacts list)
+*
+* @param Set<Contact> the contacts list to be checked
+* @return boolean true if the list contains the contact, and false if not
+*/
 	private boolean containsContact(Set<Contact> contactList, Contact newContact){
 		for(Contact contactInContacts : contactList){
 					if(newContact.getId() == contactInContacts.getId()){
@@ -459,7 +541,12 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
 		return false;
 	}
 
-//checks whether a contact exists in the given set
+/**
+* Checks whether a contact exists in a given set of contacts
+* 
+* @param Set<Contact> the set of contacts to be checked 
+* @return boolean true if the set of contacts contains the contact, false if not
+*/
 	private boolean contactsExistIn(Set<Contact> contacts){
 		for (Contact contactInContacts : contacts){
 				if (!containsContact(this.contacts, contactInContacts)) {
@@ -469,9 +556,38 @@ or type Meeting and adds it to the list of meetings or set of contacts.*/
 		return true;
 	}
 
-//adds contacts to Set<Contact>
+/**
+* Adds contacts to the ContactManagerImpl contacts set
+*
+* @param Contact the contact to be added
+*/
 	private void addContactToSet(Contact contact){
 		contacts.add(contact);
 	}
 
+/**
+* Splits a string into an array using a regex as a marker for where the string should be split
+*
+* @param String the string to be split
+* @param String the regex to be used to identify at which points to split the string
+* @return String [] an array containing the split string 
+*/
+	private String[] mySplit(String string, String regex){
+    	Vector<String> result = new Vector<String>();
+    	int start = 0;
+    	int position = string.indexOf(regex);
+    	while (position >= start){
+        	if(position>start){
+            	result.add(string.substring(start,position));
+        	}
+        	start = position + regex.length();
+        	position = string.indexOf(regex,start); 
+    	}
+    	if (start<string.length()){
+        	result.add(string.substring(start));
+    	}
+    	String[] array = result.toArray(new String[0]);
+   		return array;
+	}
+	
 }

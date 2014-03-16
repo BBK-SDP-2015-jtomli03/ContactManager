@@ -31,7 +31,14 @@ public abstract class MeetingImpl implements Meeting, Comparable<Meeting>{
 		return contacts;
 	}
 
-//to sort meetings into chronological order
+/**
+*Compares the dates and times of meetings to sort them into chronological order
+*
+*@param Meeting the meeting to be compared
+*@return int used to sort the meetings into chronological order; 
+*        0 = same date/time, -1 = this meeting is chronologically before the meeting being compared, 
+*        1 = this meeting is chronologically after the meeting being compared.
+*/
 	@Override
 	public int compareTo(Meeting meeting){
 		if(this.getDate().equals(meeting.getDate())){
